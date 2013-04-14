@@ -1,0 +1,7 @@
+sample: Sample property
+
+http:
+  rootPath:  /v1/*
+
+database:
+  uri: mongodb://localhost:27017/bestpoll

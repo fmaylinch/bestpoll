@@ -1,0 +1,10 @@
+sample: Sample property
+
+http:
+  rootPath:  /v1/*
+  adminUsername: admin
+  adminPassword: adminpass
+
+
+database:
+  uri: mongodb://heroku:d3a35a27a7b86d96719081dd92ecf94d@linus.mongohq.com:10084/app10410618
