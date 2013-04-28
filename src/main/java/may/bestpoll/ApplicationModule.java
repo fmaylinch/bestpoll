@@ -21,10 +21,10 @@ public class ApplicationModule extends AbstractModule
     @Override
     protected void configure()
     {
-		bind(new TypeLiteral<Dao<Sequence, ObjectId>>(){});
+		bind(new TypeLiteral<Dao<Sequence, String>>(){});
 		bind(SequenceService.class).to(SequenceServiceImpl.class);
 
-		bind(new TypeLiteral<Dao<User, ObjectId>>(){});
+		bind(new TypeLiteral<Dao<User, String>>(){});
 		bind(UserService.class).to(UserServiceImpl.class);
 
 		bind(new TypeLiteral<Dao<Poll, ObjectId>>(){});

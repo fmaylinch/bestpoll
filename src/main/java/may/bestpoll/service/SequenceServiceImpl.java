@@ -9,10 +9,10 @@ import org.bson.types.ObjectId;
 
 public class SequenceServiceImpl implements SequenceService
 {
-	private final Dao<Sequence, ObjectId> sequenceDAO;
+	private final Dao<Sequence, String> sequenceDAO;
 
 	@Inject
-	public SequenceServiceImpl(Dao<Sequence, ObjectId> sequenceDAO)
+	public SequenceServiceImpl(Dao<Sequence, String> sequenceDAO)
 	{
 		this.sequenceDAO = sequenceDAO;
 	}

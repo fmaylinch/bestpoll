@@ -7,10 +7,10 @@ import org.bson.types.ObjectId;
 
 public class UserServiceImpl implements UserService
 {
-    private final Dao<User, ObjectId> userDAO;
+    private final Dao<User, String> userDAO;
 
     @Inject
-    public UserServiceImpl(Dao<User, ObjectId> userDAO)
+    public UserServiceImpl(Dao<User, String> userDAO)
     {
         this.userDAO = userDAO;
 	}

@@ -4,11 +4,15 @@ import com.google.inject.Inject;
 import may.bestpoll.dao.Dao;
 import may.bestpoll.entities.Poll;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
 public class PollServiceImpl implements PollService
 {
+	private static final Logger logger = LoggerFactory.getLogger(PollServiceImpl.class);
+
 	private final Dao<Poll, ObjectId> pollDao;
 
 	@Inject
@@ -18,10 +22,18 @@ public class PollServiceImpl implements PollService
 	}
 
 	@Override
-	public ObjectId create(Poll poll)
+	public String create(Poll poll)
 	{
+		// TODO: Avoid duplicates
+		poll.setPermalink(formatForUrl(poll.getMessage()));
+
 		pollDao.save(poll);
-		return poll.getId();
+		return poll.getId().toString();
+	}
+
+	private String formatForUrl(String text)
+	{
+		return text.toLowerCase().replaceAll("[^ a-z0-9]", "").replace(' ', '-');
 	}
 
 	@Override

@@ -1,20 +1,27 @@
 package may.bestpoll.entities;
 
 import com.google.code.morphia.annotations.Entity;
+import com.google.code.morphia.annotations.Id;
 import com.google.code.morphia.annotations.Reference;
-import may.bestpoll.entities.base.Identity;
+import may.bestpoll.entities.base.DatedObject;
+import org.bson.types.ObjectId;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Collection;
 import java.util.Set;
 
 @Entity(value = "polls", noClassnameStored = true)
-public class Poll extends Identity
+public class Poll extends DatedObject
 {
+	@Id
+	private ObjectId id;
+
 	@NotEmpty
 	private String message;
 
-//	@NotEmpty // TODO: with @NotEmpty there is a validation exception when calling PollResource.create
+	private String permalink;
+
+	//	@NotEmpty // TODO: with @NotEmpty there is a validation exception when calling PollResource.create
 	@Reference
 	private User creator;
 
@@ -26,6 +33,17 @@ public class Poll extends Identity
 
 	private Set<String> tags;
 
+
+	public ObjectId getId()
+	{
+		return id;
+	}
+
+	public void setId(ObjectId id)
+	{
+		this.id = id;
+	}
+
 	public String getMessage()
 	{
 		return message;
@@ -34,6 +52,16 @@ public class Poll extends Identity
 	public void setMessage(String message)
 	{
 		this.message = message;
+	}
+
+	public String getPermalink()
+	{
+		return permalink;
+	}
+
+	public void setPermalink(String permalink)
+	{
+		this.permalink = permalink;
 	}
 
 	public User getCreator()

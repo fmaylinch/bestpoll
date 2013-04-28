@@ -12,7 +12,7 @@ public interface PollService
 	/**
 	 * Creates a poll and returns its id.
 	 */
-	ObjectId create(Poll poll);
+	String create(Poll poll);
 
 	/**
 	 * Returns the poll with the given id, or null if it doesn't exist.

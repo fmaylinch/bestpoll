@@ -2,11 +2,10 @@ package may.bestpoll.entities;
 
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
-import may.bestpoll.entities.base.Identity;
-import may.bestpoll.entities.base.Identity;
+import may.bestpoll.entities.base.DatedObject;
 
 @Entity(value="users", noClassnameStored=true)
-public class User
+public class User extends DatedObject
 {
 	@Id
 	private String username;
