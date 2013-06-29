@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Angular JS tests</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Bootstrap -->
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="../fontawesome/css/font-awesome.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+
+	<h2>AngularJS playground</h2>
+	<h3>
+		<a target="_blank" href="http://www.egghead.io/">
+			Tutorial videos <i class="icon-external-link"></i>
+		</a>
+	</h3>
+
+	<div ng-app="myApp">
+
+		<hello></hello>
+
+		<a class="btn" enter leave toggleclazz="btn-primary">
+			Move mouse over here to change its class
+		</a>
+
+		<div ng-controller="MyController4">
+			<a class="btn" enterapply="logSomething()">
+				Move mouse over here to log something
+			</a>
+		</div>
+
+		<hr>
+
+		<div ng-controller="UsersController">
+			Search (whatever): <input type="text" ng-model="searchText"><br>
+			Search (only name): <input type="text" ng-model="search.name">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Surname</th>
+						<th>Age</th>
+					</tr>
+				</thead>
+				<tr ng-repeat="user in userData.users | filter:searchText | filter:search">
+					<td>{{user.name}}</td>
+					<td>{{user.surname}}</td>
+					<td>{{user.age}}</td>
+				</tr>
+			</table>
+		</div>
+
+		<hr>
+
+		<div ng-controller="MyController1">
+			Input: <input type="text" ng-model="data.message" placeholder="Enter something here">
+			<b>{{data.message}}</b>
+		</div>
+		<div ng-controller="MyController2">
+			Input: <input type="text" ng-model="data.message" placeholder="Enter something here">
+			<b>{{reverseMessage(data.message)}}</b> <!-- Using function -->
+		</div>
+		<div ng-controller="MyController3">
+			Input: <input type="text" ng-model="data.message" placeholder="Enter something here">
+			<b>{{data.message|reverse}}</b> <!-- Using filter -->
+		</div>
+	</div>
+
+	<!-- In the examples, they put the scripts at the end like this -->
+	<script src="../angular/angular.min.js"></script>
+	<script src="../jquery/jquery-1.9.1.min.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
+	<script src="angular-coffee-test.js"></script>
+	<!--
+		Not used because we use the JS generated from CoffeeScript
+		<script src="angular-test.js"></script>
+	-->
+
+</body>
+</html>
