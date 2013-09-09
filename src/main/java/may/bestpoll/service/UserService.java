@@ -6,9 +6,11 @@ import org.bson.types.ObjectId;
 public interface UserService
 {
 	/**
-	 * The user must have a unique username
+	 * Gets or creates a user.
+	 *
+	 * @param user  must come with facebookId and name (TODO: later we will support googleId)
+	 *
+	 * @return complete user with id
 	 */
-    void create(User user);
-
-    User findByUsername(String username);
+    User assureUser(User user);
 }

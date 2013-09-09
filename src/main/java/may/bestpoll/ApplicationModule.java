@@ -1,34 +1,30 @@
 package may.bestpoll;
 
-import com.google.code.morphia.Morphia;
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Provides;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoURI;
 import com.yammer.dropwizard.config.Configuration;
-import may.bestpoll.dao.Dao;
-import may.bestpoll.entities.Poll;
-import may.bestpoll.entities.Sequence;
-import may.bestpoll.entities.User;
+import may.bestpoll.dao.QuestionDao;
+import may.bestpoll.dao.QuestionDaoImpl;
 import may.bestpoll.service.*;
-import org.bson.types.ObjectId;
+
+import java.net.UnknownHostException;
 
 public class ApplicationModule extends AbstractModule
 {
     @Override
     protected void configure()
     {
-		bind(new TypeLiteral<Dao<Sequence, String>>(){});
 		bind(SequenceService.class).to(SequenceServiceImpl.class);
 
-		bind(new TypeLiteral<Dao<User, String>>(){});
 		bind(UserService.class).to(UserServiceImpl.class);
 
-		bind(new TypeLiteral<Dao<Poll, ObjectId>>(){});
-		bind(PollService.class).to(PollServiceImpl.class);
+		bind(QuestionDao.class).to(QuestionDaoImpl.class);
+		bind(QuestionService.class).to(QuestionServiceImpl.class);
     }
 
     @Provides
@@ -51,25 +47,23 @@ public class ApplicationModule extends AbstractModule
         return new MongoURI(configuration.getDatabase().getUri()).getDatabase();
     }
 
-    @Provides
-    public Mongo provideMongo(ApplicationConfiguration configuration) throws Exception
+	@Provides
+	@Inject
+	public DB provideDB(ApplicationConfiguration configuration) throws UnknownHostException
+	{
+		MongoURI mongoURI = new MongoURI(configuration.getDatabase().getUri());
+		DB db = mongoURI.connectDB();
+		if (mongoURI.getUsername() != null)
+		{
+			db.authenticate(mongoURI.getUsername(), mongoURI.getPassword());
+		}
+		return db;
+	}
+
+	@Provides
+	@Inject
+    public Mongo provideMongo(DB db)
     {
-        MongoURI mongoURI = new MongoURI(configuration.getDatabase().getUri());
-        DB db = mongoURI.connectDB();
-        if (mongoURI.getUsername() != null)
-        {
-            db.authenticate(mongoURI.getUsername(), mongoURI.getPassword());
-        }
         return  db.getMongo();
-
     }
-
-    @Provides
-    public Morphia provideMorphia()
-    {
-        Morphia morphia = new Morphia();
-        morphia.mapPackage("may.bestpoll.entities");
-        return morphia;
-    }
-
 }

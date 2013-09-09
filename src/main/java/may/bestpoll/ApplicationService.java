@@ -2,6 +2,7 @@ package may.bestpoll;
 
 import com.hubspot.dropwizard.guice.GuiceBundle;
 import com.yammer.dropwizard.Service;
+import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 
@@ -16,6 +17,7 @@ public class ApplicationService extends Service<ApplicationConfiguration>
         public void initialize(Bootstrap<ApplicationConfiguration> bootstrap)
         {
             bootstrap.setName("bestpoll");
+			bootstrap.addBundle(new AssetsBundle("/pages/", "/"));
             bootstrap.addBundle(GuiceBundle.newBuilder()
                 .addModule(new ApplicationModule())
                 .enableAutoConfig(getClass().getPackage().getName())

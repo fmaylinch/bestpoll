@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.mongodb.Mongo;
 import com.yammer.dropwizard.lifecycle.Managed;
 
+// TODO: Check if this is necessary
+
 public class MongoManaged implements Managed
 {
     private final Mongo mongo;

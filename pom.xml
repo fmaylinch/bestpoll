@@ -33,11 +33,13 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongo.java.driver.version}</version>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
 			<version>${morphia.version}</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>

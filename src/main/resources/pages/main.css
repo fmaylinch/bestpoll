@@ -1,0 +1,55 @@
+
+/* http://www.yearofmoo.com/2012/10/more-angularjs-magic-to-supercharge-your-webapp.html#show-hide-cloak-and-init */
+.ng-cloak {
+    /* this will change to block when scope and angular is ready */
+    display:none;
+}
+
+/* From Bootstrap examples: Move down content because we have a fixed navbar that is 50px tall */
+body {
+    padding-top: 100px; /* A lot because now we have a big navbar when the user is logged. TODO: fix the navbar */
+    padding-bottom: 20px;
+}
+
+
+/* Now my styles */
+
+.best-question .best-text {
+    color: #09206c;
+}
+
+.best-question .best-in {
+    color: #888888;
+    font-size: 70%;
+}
+
+.best-question .best-place {
+    color: #525a85;
+    font-size: 80%;
+}
+
+.best-question li
+{
+    list-style-type:none;
+}
+
+.best-answer .best-text {
+    font-weight: bold;
+}
+
+.best-answer .best-votes {
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+}
+
+.icon-thumbs-down, .icon-thumbs-up {
+    color: #BBBBBB;
+}
+
+.icon-thumbs-down.best-voted {
+    color: #9b1a1d;
+}
+
+.icon-thumbs-up.best-voted {
+    color: #16601b;
+}

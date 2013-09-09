@@ -1,5 +1,6 @@
 package may.bestpoll.resources;
 
+import may.bestpoll.entities.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

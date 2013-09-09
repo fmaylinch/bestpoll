@@ -1,34 +1,41 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
-import may.bestpoll.dao.Dao;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import may.bestpoll.entities.User;
 import org.bson.types.ObjectId;
 
 public class UserServiceImpl implements UserService
 {
-    private final Dao<User, String> userDAO;
+	private static final String COLLECTION_NAME = "users";
 
-    @Inject
-    public UserServiceImpl(Dao<User, String> userDAO)
+	private final DBCollection users;
+
+	@Inject
+    public UserServiceImpl(DB db)
     {
-        this.userDAO = userDAO;
+		this.users = db.getCollection(COLLECTION_NAME);
 	}
 
     @Override
-    public void create(User user)
+    public User assureUser(User user)
     {
-		final User existingUser = userDAO.findOne("_id", user.getUsername());
+		// TODO: Only using Facebook by now
+		DBObject userObjectToFind = new BasicDBObject("fbId", user.getFacebookId());
+		DBObject userObjectFound = users.findOne(userObjectToFind);
 
-		if (existingUser != null) // TODO: Which kind of exception here?
-			throw new IllegalArgumentException("User already exists: " + user.getUsername());
+		// If user not found, add name and save
+		if (userObjectFound == null)
+		{
+			userObjectToFind.put("name", user.getName());
+			users.save(userObjectToFind);
+			userObjectFound = userObjectToFind;
+		}
 
-		userDAO.save(user);
-    }
-
-	@Override
-    public User findByUsername(String username)
-    {
-        return userDAO.findOne("_id", username);
+		user.setId((ObjectId) userObjectFound.get("_id"));
+		return user;
     }
 }

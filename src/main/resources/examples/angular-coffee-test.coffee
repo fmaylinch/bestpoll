@@ -22,8 +22,7 @@ myApp.factory('UserData', ->
 
 # Filters
 
-myApp.filter('reverse', (Data) -> (text) ->
-  text.split("").reverse().join("") + "-" + Data.message)
+myApp.filter('reverse', -> (text) -> reverseText(text))
 
 # Directives
 
@@ -67,7 +66,7 @@ window.MyController1 = ($scope, Data) ->
 
 window.MyController2 = ($scope, Data) ->
   $scope.data = Data
-  $scope.reverseMessage = (message) -> message.split("").reverse().join("")
+  $scope.reverseMessage = (message) -> reverseText(message)
 
 window.MyController3 = ($scope, Data) ->
   $scope.data = Data
@@ -78,3 +77,6 @@ window.MyController4 = ($scope) ->
 window.UsersController = ($scope, UserData) ->
   $scope.userData = UserData
 
+# Auxiliary functions
+
+reverseText = (text) -> text.split("").reverse().join("")

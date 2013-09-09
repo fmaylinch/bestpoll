@@ -1,7 +1,7 @@
 sample: Sample property
 
 http:
-  rootPath:  /v1/*
+  rootPath:  /api/*
 
 database:
-  uri: mongodb://localhost:27017/bestpoll
+  uri: mongodb://localhost:27017/findthebest

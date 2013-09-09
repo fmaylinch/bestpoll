@@ -1,29 +1,27 @@
 package may.bestpoll.entities;
 
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Id;
-import may.bestpoll.entities.base.DatedObject;
 
-@Entity(value="users", noClassnameStored=true)
-public class User extends DatedObject
+import org.bson.types.ObjectId;
+
+public class User
 {
-	@Id
-	private String username;
+	private ObjectId id;
 
     private String facebookId;
 
     private String googleId;
 
-    private String email;
+	private String name;
 
-	public String getUsername()
+
+	public ObjectId getId()
 	{
-		return username;
+		return id;
 	}
 
-	public void setUsername(String username)
+	public void setId(ObjectId id)
 	{
-		this.username = username;
+		this.id = id;
 	}
 
 	public String getFacebookId()
@@ -46,13 +44,13 @@ public class User extends DatedObject
 		this.googleId = googleId;
 	}
 
-	public String getEmail()
-    {
-        return email;
-    }
+	public String getName()
+	{
+		return name;
+	}
 
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 }

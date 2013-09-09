@@ -6,7 +6,6 @@ import may.bestpoll.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,23 +26,9 @@ public class UserResource
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response create(@Valid User user)
+	public Response register(User userToRegister)
 	{
-		userService.create(user);
-		return Response.status(Response.Status.CREATED).entity(user.getUsername()).build();
-	}
-
-	@GET
-	@Path("/{username}")
-	public User findByUsername(@PathParam("username") String username)
-	{
-		User user = userService.findByUsername(username);
-
-		if (user == null)
-		{
-			throw new WebApplicationException(Response.Status.NOT_FOUND);
-		}
-
-		return user;
+		User user = userService.assureUser(userToRegister);
+		return Response.status(Response.Status.OK).entity(user).build();
 	}
 }

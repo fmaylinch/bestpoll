@@ -1,4 +1,4 @@
-package may.bestpoll.resources;
+package may.bestpoll.entities;
 
 public class Status
 {
