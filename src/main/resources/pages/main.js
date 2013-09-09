@@ -205,11 +205,10 @@
           return $scope.user = userFromServer;
         });
       });
-      $scope.$on('FacebookService:noUser', function() {
+      return $scope.$on('FacebookService:noUser', function() {
         console.log("Facebook user is gone");
         return $scope.user = {};
       });
-      return $;
     }
   ]);
 

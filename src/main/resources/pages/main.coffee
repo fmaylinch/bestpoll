@@ -198,6 +198,4 @@ angular.module('findTheBestApp', ['Facebook'])
         console.log("Facebook user is gone")
         $scope.user = {}  # empty object when we know the user is not logged
       )
-
-      $
   ])
