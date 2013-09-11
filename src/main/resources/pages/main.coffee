@@ -1,10 +1,10 @@
-# Note: Changes in this file will be translated to a "js" file by
-#       the IDEA "CoffeeScript" File Watcher.
+# Note: Changes in this file will be translated to a "js" file by the IDEA "CoffeeScript" File Watcher.
+#       Now it is configured to perform the translation on save (Cmd+S), focus lost or also when restarting the app.
 
-# Apps
 
+# Module for FindTheBest
+# ----------
 angular.module('findTheBestApp', ['Facebook'])
-
 
   .config([
     'FacebookProvider',
@@ -12,12 +12,14 @@ angular.module('findTheBestApp', ['Facebook'])
 
       # Define your routes through $routeProvider and else...
       # Note: There was a problem injecting $routeProvider just in case you add it...
-      #       I think $routeProvider is not bundled by default so you need another js.
+      #       I think $routeProvider is not bundled by default anymore so you need another js.
 
       FacebookProvider.init('163167117213822') # Facebook app ID, available at https://developers.facebook.com/apps
   ])
 
-   # To use this fake service I you must remove the FacebookProvider
+
+  # To use this fake service you must remove the FacebookProvider
+  # ----------
   .factory('FakeFacebookService', [
     '$rootScope'
     ($rootScope) ->
@@ -49,15 +51,15 @@ angular.module('findTheBestApp', ['Facebook'])
   ])
 
 
-   # FacebookService will:
-   #   $broadcast('FacebookService:user', user)
-   #     when it is aware of a new user. At the beginning and each time a user logs in.
-   #   $broadcast('FacebookService:noUser')
-   #     when it is aware that there is no user. At the beginning and each time the user logs out.
-
+  # FacebookService will:
+  #   $broadcast('FacebookService:user', user)
+  #     when it is aware of a new user. At the beginning and each time a user logs in.
+  #   $broadcast('FacebookService:noUser')
+  #     when it is aware that there is no user. At the beginning and each time the user logs out.
+  # ----------
   .factory('FacebookService', [
-    '$rootScope', 'Facebook'
-    ($rootScope,   Facebook) ->
+    '$rootScope', '$log', 'Facebook',
+    ($rootScope,   $log,  Facebook) ->
 
       service = {
 
@@ -78,7 +80,7 @@ angular.module('findTheBestApp', ['Facebook'])
         # $broadcast('FacebookService:user', user) (inside angular with $apply)
         applyBroadcastUser: ->
           Facebook.api('/me', (user) ->
-            console.log("Broadcasting user with name: " + user.name)
+            $log.info("Broadcasting user with name: " + user.name)
             $rootScope.$apply( ->
               $rootScope.$broadcast('FacebookService:user', user)
             )
@@ -86,7 +88,7 @@ angular.module('findTheBestApp', ['Facebook'])
 
         # $broadcast('FacebookService:noUser') (inside angular with $apply)
         applyBroadcastLogout: ->
-          console.log("Broadcasting logout")
+          $log.info("Broadcasting logout")
           $rootScope.$apply( ->
             $rootScope.$broadcast('FacebookService:noUser')
           )
@@ -94,16 +96,16 @@ angular.module('findTheBestApp', ['Facebook'])
 
       # 'Facebook:load' is broadcasted by FacebookProvider (facebook.js) when Facebook is ready
       $rootScope.$on('Facebook:load', ->
-        console.log("Facebook loaded. Checking login status.")
+        $log.info("Facebook loaded. Checking login status.")
         Facebook.getLoginStatus(
           (response) ->
             # For convenience, if a user is already logged, the user will be broadcasted
             # and if user is not already logged, a logout will be broadcasted.
             if response.status == 'connected'
-              console.log("User is already logged")
+              $log.info("User is already logged")
               service.applyBroadcastUser()
             else
-              console.log("User not logged")
+              $log.info("User not logged")
               service.applyBroadcastLogout()
         )
       )
@@ -111,7 +113,7 @@ angular.module('findTheBestApp', ['Facebook'])
       # For convenience, when a user is logged, the user will be broadcasted (with $apply)
       $rootScope.$on('Facebook:login', (ev, data) ->
         if data.status == 'connected'
-          console.log("User has logged in")
+          $log.info("User has logged in")
           service.applyBroadcastUser()
       )
 
@@ -123,61 +125,98 @@ angular.module('findTheBestApp', ['Facebook'])
       service
   ])
 
+
+  # Service to access the FindTheBest API
+  # ----------
   .factory('FindTheBestApiService', [
-    '$http'
-    ($http) ->
+    '$http', '$log'
+    ($http,   $log) ->
 
       service = {
 
-        # Registers user on API.
+        # Registers a user
         # user: must contain 'facebookId' and 'name' properties.
-        # successCallback: called with the user as argument if user is successfully registered
+        # successCallback: called with the user as argument (it will also have the 'id' property)
         # ----------
         registerUser: (user, successCallback) ->
           $http.post('api/user', user)
-            .success((data, status, headers, config) ->
-              console.log("Login on server OK")
-              successCallback(data);
+            .success((userCreated, status, headers, config) ->
+              $log.info("API: Register user OK")
+              successCallback(userCreated);
             )
             .error((data, status, headers, config) ->
-              console.log("Login on server ERROR")
-              console.log(status)
-              console.log(data)
+              $log.error("API: Register user ERROR")
+              $log.error(status)
+              $log.error(data)
             )
 
+        # Creates a question
+        # question: must contain 'message' and 'creator.id'; 'location' is optional.
+        # successCallback: called with the created question as argument (it will have also the 'id' property)
+        # ----------
+        createQuestion: (question, successCallback) ->
+          $http.post('api/question', question)
+            .success((questionCreated, status, headers, config) ->
+              $log.info("API: Question create OK")
+              successCallback(questionCreated);
+            )
+            .error((data, status, headers, config) ->
+              $log.error("API: Question create ERROR")
+              $log.error(status)
+              $log.error(data)
+            )
+
+        # Adds an answer to a question
+        # answer: must contain 'text', 'creator.id' and 'question.id'; 'url' is optional.
+        # successCallback: called with the created answer as argument (it will have also the 'id' property)
+        # ----------
+        createAnswer: (answer, successCallback) ->
+          $http.post('api/answer', answer)
+            .success((answerCreated, status, headers, config) ->
+              $log.info("API: Answer create OK")
+              successCallback(answerCreated);
+            )
+            .error((data, status, headers, config) ->
+              $log.error("API: Answer create ERROR")
+              $log.error(status)
+              $log.error(data)
+            )
       }
 
       service
   ])
 
-      # This controller uses my FacebookService so it's simpler
+
+  # Main controller for the FindTheBest angular app
+  # ----------
   .controller('FindTheBestController', [
-    '$scope', 'FacebookService', 'FindTheBestApiService',
-    ($scope,   FacebookService,   ftbApi) ->
+    '$scope', '$log', 'FacebookService', 'FindTheBestApiService',
+    ($scope,  $log,    FacebookService,   ftbApi) ->
 
       $scope.questions = [
-        {text:'Shawarma', place:'Barcelona', answers: [
-          {text:'Sannin', points:86, your_vote:1},
-          {text:'Urgarit', points:56, your_vote:1, url:'http://www.ugarit.es'},
-          {text:'Equinox', points:48, your_vote:1, url:'http://www.equinoxverdi.com/'},
-          {text:'Sundown', points:13, your_vote:0},
-          {text:'Petra', points:28, your_vote:-1},
+        {id:0, message:'Street headphones (add answers here to test, it has id)', anwers:[]},
+        {message:'Shawarma', location:'Barcelona', answers: [
+          {text:'Sannin', points:86, yourVote:1},
+          {text:'Urgarit', points:56, yourVote:1, url:'http://www.ugarit.es'},
+          {text:'Equinox', points:48, yourVote:1, url:'http://www.equinoxverdi.com/'},
+          {text:'Sundown', points:13, yourVote:0},
+          {text:'Petra', points:28, yourVote:-1},
         ]},
-        {text:'Brand of mountain bikes', answers: [
-          {text:'Specialized', points:235, your_vote:0, url:'http://www.specialized.com'},
-          {text:'Giant', points:186, your_vote:0, url:'http://www.giant-bicycles.com'},
-          {text:'Cannondale', points:146, your_vote:0, url:'http://www.cannondale.com'},
-          {text:'Mondraker', points:128, your_vote:0, url:'http://www.mondraker.com'},
-          {text:'Lapierre', points:107, your_vote:0, url:'http://lapierrebikes.com/'},
+        {message:'Brand of mountain bikes', answers: [
+          {text:'Specialized', points:235, yourVote:0, url:'http://www.specialized.com'},
+          {text:'Giant', points:186, yourVote:0, url:'http://www.giant-bicycles.com'},
+          {text:'Cannondale', points:146, yourVote:0, url:'http://www.cannondale.com'},
+          {text:'Mondraker', points:128, yourVote:0, url:'http://www.mondraker.com'},
+          {text:'Lapierre', points:107, yourVote:0, url:'http://lapierrebikes.com/'},
         ]},
-        {text:'Pizza restaurant', place:'Italy', answers: [
-          {text:'Pizzalia 1', points:10, your_vote:0},
-          {text:'Pizzalia 2', points:20, your_vote:0},
-          {text:'Pizzalia 3', points:30, your_vote:0},
+        {message:'Pizza restaurant', location:'Italy', answers: [
+          {text:'Pizzalia 1', points:10, yourVote:0},
+          {text:'Pizzalia 2', points:20, yourVote:0},
+          {text:'Pizzalia 3', points:30, yourVote:0},
         ]}
       ]
 
-      $scope.user = null  # user will be null until we know whether the user is logged or not
+      $scope.user = { logged: null }  # logged will be null until we know whether the user is logged or not
 
       $scope.login = ->
         FacebookService.login()
@@ -186,16 +225,56 @@ angular.module('findTheBestApp', ['Facebook'])
         FacebookService.logout()
 
       $scope.$on('FacebookService:user', (ev, fbUser) ->
-        console.log("Facebook user detected: " + fbUser.name)
+        $log.info("Facebook user detected: " + fbUser.name)
         userToRegister = { facebookId: fbUser.id, name: fbUser.name } # Corresponds to User class
         ftbApi.registerUser(userToRegister, (userFromServer) ->
-          console.log("User successfully logged on facebook and registered on our API")
-          $scope.user = userFromServer  # the user is logged
+          $log.info("User successfully logged on facebook and registered on our API")
+          userFromServer.logged = true  # the user is logged
+          $scope.user = userFromServer
         )
       )
 
       $scope.$on('FacebookService:noUser', ->
-        console.log("Facebook user is gone")
-        $scope.user = {}  # empty object when we know the user is not logged
+        $log.info("Facebook user is gone")
+        $scope.user = { logged: false }  # assign object when we know the user is not logged
       )
+  ])
+
+
+  # Controller for the form to add questions
+  # ----------
+  .controller('NewQuestionController', [
+    '$scope', '$log', 'FindTheBestApiService',
+    ($scope,   $log,   ftbApi) ->
+
+      $scope.question = {}
+
+      $scope.addQuestion = ->
+        $scope.question.creator = {id:$scope.user.id}
+        $log.info($scope.question)
+        ftbApi.createQuestion($scope.question, (questionCreated) ->
+          $log.info("Question created!")
+          $log.info(questionCreated)
+          # TODO: Show message to user
+          # TODO: Add question to results? Depending on filter (although now there is no filter)
+          $scope.question = {}
+        )
+  ])
+
+  # Controller for the question list, where answers can be added and voted
+  # ----------
+  .controller('QuestionsController', [
+    '$scope', '$log', 'FindTheBestApiService',
+    ($scope,   $log,   ftbApi) ->
+
+      $scope.addNewAnswer = (question) ->
+        answer = { text: question.newAnswer, creator: {id:$scope.user.id}, question: {id: question.id} }
+        $log.info(answer)
+        ftbApi.createAnswer(answer, (answerCreated) ->
+          $log.info("Answer created!")
+          $log.info(answerCreated)
+          # TODO: Show message to user
+          # TODO: Add answer to question in the view
+          question.newAnswer = ""
+        )
   ])

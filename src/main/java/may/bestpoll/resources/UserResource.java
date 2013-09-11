@@ -26,9 +26,9 @@ public class UserResource
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response register(User userToRegister)
+	public Response register(User user)
 	{
-		User user = userService.assureUser(userToRegister);
+		userService.assureUser(user);
 		return Response.status(Response.Status.OK).entity(user).build();
 	}
 }

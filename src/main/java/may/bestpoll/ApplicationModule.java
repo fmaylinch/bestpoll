@@ -8,8 +8,6 @@ import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoURI;
 import com.yammer.dropwizard.config.Configuration;
-import may.bestpoll.dao.QuestionDao;
-import may.bestpoll.dao.QuestionDaoImpl;
 import may.bestpoll.service.*;
 
 import java.net.UnknownHostException;
@@ -23,7 +21,6 @@ public class ApplicationModule extends AbstractModule
 
 		bind(UserService.class).to(UserServiceImpl.class);
 
-		bind(QuestionDao.class).to(QuestionDaoImpl.class);
 		bind(QuestionService.class).to(QuestionServiceImpl.class);
     }
 

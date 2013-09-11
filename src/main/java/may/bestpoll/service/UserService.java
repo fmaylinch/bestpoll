@@ -6,11 +6,9 @@ import org.bson.types.ObjectId;
 public interface UserService
 {
 	/**
-	 * Gets or creates a user.
+	 * Assures that user is present in the DB. After the call, it will have the id.
 	 *
-	 * @param user  must come with facebookId and name (TODO: later we will support googleId)
-	 *
-	 * @return complete user with id
+	 * @param user  must have facebookId and name (TODO: later we will support googleId)
 	 */
-    User assureUser(User user);
+    void assureUser(User user);
 }

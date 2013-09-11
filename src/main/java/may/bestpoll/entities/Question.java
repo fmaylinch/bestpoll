@@ -12,16 +12,14 @@ public class Question
 
 	private String location; // TODO: improve: store real location like city, country or anywhere
 
-	private List<Option> options;
+	private List<Answer> answers;
 
 	private User creator;
 
 
-	public Question(long id, String message, User creator)
+	public Question()
 	{
-		this.id = id;
-		this.message = message;
-		this.creator = creator;
+
 	}
 
 
@@ -55,14 +53,14 @@ public class Question
 		this.location = location;
 	}
 
-	public List<Option> getOptions()
+	public List<Answer> getAnswers()
 	{
-		return options;
+		return answers;
 	}
 
-	public void setOptions(List<Option> options)
+	public void setAnswers(List<Answer> answers)
 	{
-		this.options = options;
+		this.answers = answers;
 	}
 
 	public User getCreator()

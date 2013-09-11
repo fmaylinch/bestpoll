@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.util.Collection;
 
-@Path("/poll")
+@Path("/question")
 @Produces(MediaType.APPLICATION_JSON)
 public class QuestionResource
 {
@@ -31,21 +30,7 @@ public class QuestionResource
 	public Response create(Question question)
 	{
 		questionService.create(question);
-		return Response.created(UriBuilder.fromResource(QuestionResource.class).build(question.getId())).build();
-	}
-
-	@GET
-	@Path("/{id}")
-	public Question findById(@PathParam("id") long id)
-	{
-		Question question = questionService.findById(id);
-
-		if (question == null)
-		{
-			throw new WebApplicationException(Response.Status.NOT_FOUND);
-		}
-
-		return question;
+		return Response.status(Response.Status.OK).entity(question).build();
 	}
 
 	@GET

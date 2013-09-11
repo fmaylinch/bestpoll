@@ -1,48 +1,91 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
-import may.bestpoll.dao.QuestionDao;
+import com.mongodb.*;
+import may.bestpoll.entities.Answer;
 import may.bestpoll.entities.Question;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import static may.bestpoll.util.MongoUtil.OP_PUSH;
+import static may.bestpoll.util.MongoUtil.getList;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 public class QuestionServiceImpl implements QuestionService
 {
 	private static final Logger logger = LoggerFactory.getLogger(QuestionServiceImpl.class);
 
-	private final QuestionDao questionDao;
+	private static final String COLLECTION_NAME = "questions";
+
+	private static final String FIELD_ID = "_id";
+	private static final String FIELD_LOCATION = "loc";
+	private static final String FIELD_MESSAGE = "msg";
+	private static final String FIELD_TEXT = "text";
+	private static final String FIELD_URL = "url";
+	private static final String FIELD_CREATOR = "user";
+	private static final String FIELD_VOTES = "votes";
+	private static final String FIELD_ANSWERS = "ans";
+
+	private final DBCollection questions;
+	private final SequenceService sequenceService;
 
 	@Inject
-	public QuestionServiceImpl(QuestionDao questionDao)
+	public QuestionServiceImpl(DB db, SequenceService sequenceService)
 	{
-		this.questionDao = questionDao;
+		this.questions = db.getCollection(COLLECTION_NAME);
+		this.sequenceService = sequenceService;
 	}
 
 	@Override
-	public long create(Question question)
+	public void create(Question question)
 	{
-		questionDao.create(question);
+		question.setId(sequenceService.getCounter(COLLECTION_NAME));
 
-		return question.getId();
+		DBObject questionObj = new BasicDBObject()
+				.append(FIELD_ID, question.getId())
+				.append(FIELD_CREATOR, question.getCreator().getId())
+				.append(FIELD_LOCATION, question.getLocation())
+				.append(FIELD_MESSAGE, question.getMessage());
+
+		questions.save(questionObj);
 	}
 
 	@Override
-	public Question findById(long id)
+	public void addAnswer(Answer answer)
 	{
-		return questionDao.findById(id);
+		final BasicDBObject questionId = new BasicDBObject(FIELD_ID, answer.getQuestion().getId());
+		DBObject questionObj = questions.findOne(questionId);
+
+		// Check question exists
+		if (questionObj == null)
+			throw new RuntimeException("Question " + answer.getQuestion().getId() + " not found"); // TODO: improve
+
+		List<DBObject> answerObjs = getList(questionObj, FIELD_ANSWERS);
+		if (answerObjs == null)
+			answerObjs = new ArrayList<DBObject>();
+
+		// Check answer doesn't exist
+		for (DBObject answerObj : answerObjs)
+			if (answer.getText().equals(answerObj.get(FIELD_TEXT)))
+				throw new RuntimeException("Question " + answer.getQuestion().getId() + " already contains answer: " + answer.getText()); // TODO: Improve
+
+		final DBObject newAnswerObj = new BasicDBObject()
+				.append(FIELD_TEXT, answer.getText())
+				.append(FIELD_CREATOR, answer.getCreator().getId())
+				.append(FIELD_VOTES, 0);
+		if (isNotEmpty(answer.getUrl()))
+			newAnswerObj.put(FIELD_URL, answer.getUrl());
+
+		questions.update(questionId, new BasicDBObject(OP_PUSH, new BasicDBObject(FIELD_ANSWERS, newAnswerObj)));
 	}
 
 	@Override
 	public Collection<Question> findLatest(int offset, int limit)
 	{
-		if (limit > MAX_RESULT_SIZE)
-			throw new IllegalArgumentException("limit can't be greater than " + MAX_RESULT_SIZE);
-
-		// TODO
-//		return pollDao.createQuery().order("-date").offset(offset).limit(limit).asList();
-
-		return null;
+		return null;  // TODO: how to store and retrieve question data (related to: how keep track of votes?)
 	}
 }

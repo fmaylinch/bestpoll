@@ -32,7 +32,7 @@
       return service;
     }
   ]).factory('FacebookService', [
-    '$rootScope', 'Facebook', function($rootScope, Facebook) {
+    '$rootScope', '$log', 'Facebook', function($rootScope, $log, Facebook) {
       var service;
 
       service = {
@@ -50,34 +50,34 @@
         },
         applyBroadcastUser: function() {
           return Facebook.api('/me', function(user) {
-            console.log("Broadcasting user with name: " + user.name);
+            $log.info("Broadcasting user with name: " + user.name);
             return $rootScope.$apply(function() {
               return $rootScope.$broadcast('FacebookService:user', user);
             });
           });
         },
         applyBroadcastLogout: function() {
-          console.log("Broadcasting logout");
+          $log.info("Broadcasting logout");
           return $rootScope.$apply(function() {
             return $rootScope.$broadcast('FacebookService:noUser');
           });
         }
       };
       $rootScope.$on('Facebook:load', function() {
-        console.log("Facebook loaded. Checking login status.");
+        $log.info("Facebook loaded. Checking login status.");
         return Facebook.getLoginStatus(function(response) {
           if (response.status === 'connected') {
-            console.log("User is already logged");
+            $log.info("User is already logged");
             return service.applyBroadcastUser();
           } else {
-            console.log("User not logged");
+            $log.info("User not logged");
             return service.applyBroadcastLogout();
           }
         });
       });
       $rootScope.$on('Facebook:login', function(ev, data) {
         if (data.status === 'connected') {
-          console.log("User has logged in");
+          $log.info("User has logged in");
           return service.applyBroadcastUser();
         }
       });
@@ -87,105 +87,131 @@
       return service;
     }
   ]).factory('FindTheBestApiService', [
-    '$http', function($http) {
+    '$http', '$log', function($http, $log) {
       var service;
 
       service = {
         registerUser: function(user, successCallback) {
-          return $http.post('api/user', user).success(function(data, status, headers, config) {
-            console.log("Login on server OK");
-            return successCallback(data);
+          return $http.post('api/user', user).success(function(userCreated, status, headers, config) {
+            $log.info("API: Register user OK");
+            return successCallback(userCreated);
           }).error(function(data, status, headers, config) {
-            console.log("Login on server ERROR");
-            console.log(status);
-            return console.log(data);
+            $log.error("API: Register user ERROR");
+            $log.error(status);
+            return $log.error(data);
+          });
+        },
+        createQuestion: function(question, successCallback) {
+          return $http.post('api/question', question).success(function(questionCreated, status, headers, config) {
+            $log.info("API: Question create OK");
+            return successCallback(questionCreated);
+          }).error(function(data, status, headers, config) {
+            $log.error("API: Question create ERROR");
+            $log.error(status);
+            return $log.error(data);
+          });
+        },
+        createAnswer: function(answer, successCallback) {
+          return $http.post('api/answer', answer).success(function(answerCreated, status, headers, config) {
+            $log.info("API: Answer create OK");
+            return successCallback(answerCreated);
+          }).error(function(data, status, headers, config) {
+            $log.error("API: Answer create ERROR");
+            $log.error(status);
+            return $log.error(data);
           });
         }
       };
       return service;
     }
   ]).controller('FindTheBestController', [
-    '$scope', 'FacebookService', 'FindTheBestApiService', function($scope, FacebookService, ftbApi) {
+    '$scope', '$log', 'FacebookService', 'FindTheBestApiService', function($scope, $log, FacebookService, ftbApi) {
       $scope.questions = [
         {
-          text: 'Shawarma',
-          place: 'Barcelona',
+          id: 0,
+          message: 'Street headphones (add answers here to test, it has id)',
+          anwers: []
+        }, {
+          message: 'Shawarma',
+          location: 'Barcelona',
           answers: [
             {
               text: 'Sannin',
               points: 86,
-              your_vote: 1
+              yourVote: 1
             }, {
               text: 'Urgarit',
               points: 56,
-              your_vote: 1,
+              yourVote: 1,
               url: 'http://www.ugarit.es'
             }, {
               text: 'Equinox',
               points: 48,
-              your_vote: 1,
+              yourVote: 1,
               url: 'http://www.equinoxverdi.com/'
             }, {
               text: 'Sundown',
               points: 13,
-              your_vote: 0
+              yourVote: 0
             }, {
               text: 'Petra',
               points: 28,
-              your_vote: -1
+              yourVote: -1
             }
           ]
         }, {
-          text: 'Brand of mountain bikes',
+          message: 'Brand of mountain bikes',
           answers: [
             {
               text: 'Specialized',
               points: 235,
-              your_vote: 0,
+              yourVote: 0,
               url: 'http://www.specialized.com'
             }, {
               text: 'Giant',
               points: 186,
-              your_vote: 0,
+              yourVote: 0,
               url: 'http://www.giant-bicycles.com'
             }, {
               text: 'Cannondale',
               points: 146,
-              your_vote: 0,
+              yourVote: 0,
               url: 'http://www.cannondale.com'
             }, {
               text: 'Mondraker',
               points: 128,
-              your_vote: 0,
+              yourVote: 0,
               url: 'http://www.mondraker.com'
             }, {
               text: 'Lapierre',
               points: 107,
-              your_vote: 0,
+              yourVote: 0,
               url: 'http://lapierrebikes.com/'
             }
           ]
         }, {
-          text: 'Pizza restaurant',
-          place: 'Italy',
+          message: 'Pizza restaurant',
+          location: 'Italy',
           answers: [
             {
               text: 'Pizzalia 1',
               points: 10,
-              your_vote: 0
+              yourVote: 0
             }, {
               text: 'Pizzalia 2',
               points: 20,
-              your_vote: 0
+              yourVote: 0
             }, {
               text: 'Pizzalia 3',
               points: 30,
-              your_vote: 0
+              yourVote: 0
             }
           ]
         }
       ];
-      $scope.user = null;
+      $scope.user = {
+        logged: null
+      };
       $scope.login = function() {
         return FacebookService.login();
       };
@@ -195,20 +221,60 @@
       $scope.$on('FacebookService:user', function(ev, fbUser) {
         var userToRegister;
 
-        console.log("Facebook user detected: " + fbUser.name);
+        $log.info("Facebook user detected: " + fbUser.name);
         userToRegister = {
           facebookId: fbUser.id,
           name: fbUser.name
         };
         return ftbApi.registerUser(userToRegister, function(userFromServer) {
-          console.log("User successfully logged on facebook and registered on our API");
+          $log.info("User successfully logged on facebook and registered on our API");
+          userFromServer.logged = true;
           return $scope.user = userFromServer;
         });
       });
       return $scope.$on('FacebookService:noUser', function() {
-        console.log("Facebook user is gone");
-        return $scope.user = {};
+        $log.info("Facebook user is gone");
+        return $scope.user = {
+          logged: false
+        };
       });
+    }
+  ]).controller('NewQuestionController', [
+    '$scope', '$log', 'FindTheBestApiService', function($scope, $log, ftbApi) {
+      $scope.question = {};
+      return $scope.addQuestion = function() {
+        $scope.question.creator = {
+          id: $scope.user.id
+        };
+        $log.info($scope.question);
+        return ftbApi.createQuestion($scope.question, function(questionCreated) {
+          $log.info("Question created!");
+          $log.info(questionCreated);
+          return $scope.question = {};
+        });
+      };
+    }
+  ]).controller('QuestionsController', [
+    '$scope', '$log', 'FindTheBestApiService', function($scope, $log, ftbApi) {
+      return $scope.addNewAnswer = function(question) {
+        var answer;
+
+        answer = {
+          text: question.newAnswer,
+          creator: {
+            id: $scope.user.id
+          },
+          question: {
+            id: question.id
+          }
+        };
+        $log.info(answer);
+        return ftbApi.createAnswer(answer, function(answerCreated) {
+          $log.info("Answer created!");
+          $log.info(answerCreated);
+          return question.newAnswer = "";
+        });
+      };
     }
   ]);
 

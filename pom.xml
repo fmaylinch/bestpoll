@@ -46,6 +46,11 @@
 			<version>${testng.release.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
+		</dependency>
 	</dependencies>
 
 	<properties>
@@ -59,6 +64,7 @@
 		<mongo.java.driver.version>2.9.3</mongo.java.driver.version>
 		<morphia.version>1.00-SNAPSHOT</morphia.version>
 		<testng.release.version>5.14.10</testng.release.version>
+		<commons-lang3.version>3.1</commons-lang3.version>
 	</properties>
 
 	<build>
