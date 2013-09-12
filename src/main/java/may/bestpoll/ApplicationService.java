@@ -5,6 +5,7 @@ import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
+import may.bestpoll.exception.FindTheBestExceptionMapper;
 
 public class ApplicationService extends Service<ApplicationConfiguration>
 {
@@ -25,10 +26,9 @@ public class ApplicationService extends Service<ApplicationConfiguration>
             );
         }
 
-
         @Override
         public void run(ApplicationConfiguration configuration, Environment environment) throws Exception
         {
-
+			environment.addProvider(new FindTheBestExceptionMapper());
         }
 }

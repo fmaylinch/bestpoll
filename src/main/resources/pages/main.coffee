@@ -7,18 +7,32 @@
 angular.module('findTheBestApp', ['Facebook'])
 
   .config([
-    'FacebookProvider',
-    (FacebookProvider) ->
+    'FacebookProvider', '$httpProvider'
+    (FacebookProvider,   $httpProvider) ->
 
-      # Define your routes through $routeProvider and else...
-      # Note: There was a problem injecting $routeProvider just in case you add it...
-      #       I think $routeProvider is not bundled by default anymore so you need another js.
-
+      # Init Facebook
       FacebookProvider.init('163167117213822') # Facebook app ID, available at https://developers.facebook.com/apps
+
+      # Log $http errors
+      $httpProvider.responseInterceptors.push('errorLoggingInterceptor');
   ])
 
+  # Interceptor for $http that logs an error when a $http call returns a 500 error.
+  # It saves us from having to call error() on every $http promise.
+  # ----------
+  .factory('errorLoggingInterceptor', [
+    '$log', '$q',
+    ($log,   $q) ->
+      (responsePromise) ->
+        responsePromise.then(null, (errResponse) ->
+          if errResponse.status == 500
+            $log.error('$http returned ' + errResponse.status + '. Data:')
+            $log.error(errResponse.data)
+          $q.reject(errResponse) # "Re-throw" the error; someone might want to do something with it
+        )
+  ])
 
-  # To use this fake service you must remove the FacebookProvider
+  # To use this fake service you must remove the FacebookProvider in config()
   # ----------
   .factory('FakeFacebookService', [
     '$rootScope'
@@ -26,22 +40,22 @@ angular.module('findTheBestApp', ['Facebook'])
 
       service = {
 
-        # Login if not already logged and broadcasts 'FacebookService:me' with user
+        # Login if not already logged and broadcasts 'FacebookService:user' with user
         loginIfNecessary: ->
           service.login()
 
-        # Login and broadcasts 'FacebookService:me' with user
+        # Login and broadcasts 'FacebookService:user' with user
         login: ->
           service.applyBroadcastUser()
 
-        # Logout and broadcasts 'FacebookService.logout'
+        # Logout and broadcasts 'FacebookService.noUser'
         logout: ->
           $rootScope.$broadcast('FacebookService:noUser')
 
-        # Broadcasts 'FacebookService:me' with user
+        # Broadcasts 'FacebookService:user' with user
         applyBroadcastUser: ->
           user = { id:'1359270259', name:'Ferran May' }
-          $rootScope.$broadcast('FacebookService:me', user)
+          $rootScope.$broadcast('FacebookService:user', user)
       }
 
       # Pretend the user is already logged in
@@ -144,11 +158,6 @@ angular.module('findTheBestApp', ['Facebook'])
               $log.info("API: Register user OK")
               successCallback(userCreated);
             )
-            .error((data, status, headers, config) ->
-              $log.error("API: Register user ERROR")
-              $log.error(status)
-              $log.error(data)
-            )
 
         # Creates a question
         # question: must contain 'message' and 'creator.id'; 'location' is optional.
@@ -160,11 +169,6 @@ angular.module('findTheBestApp', ['Facebook'])
               $log.info("API: Question create OK")
               successCallback(questionCreated);
             )
-            .error((data, status, headers, config) ->
-              $log.error("API: Question create ERROR")
-              $log.error(status)
-              $log.error(data)
-            )
 
         # Adds an answer to a question
         # answer: must contain 'text', 'creator.id' and 'question.id'; 'url' is optional.
@@ -175,11 +179,6 @@ angular.module('findTheBestApp', ['Facebook'])
             .success((answerCreated, status, headers, config) ->
               $log.info("API: Answer create OK")
               successCallback(answerCreated);
-            )
-            .error((data, status, headers, config) ->
-              $log.error("API: Answer create ERROR")
-              $log.error(status)
-              $log.error(data)
             )
       }
 
@@ -194,7 +193,7 @@ angular.module('findTheBestApp', ['Facebook'])
     ($scope,  $log,    FacebookService,   ftbApi) ->
 
       $scope.questions = [
-        {id:0, message:'Street headphones (add answers here to test, it has id)', anwers:[]},
+        {id:0, message:'Street headphones (id=0)', anwers:[]},
         {message:'Shawarma', location:'Barcelona', answers: [
           {text:'Sannin', points:86, yourVote:1},
           {text:'Urgarit', points:56, yourVote:1, url:'http://www.ugarit.es'},

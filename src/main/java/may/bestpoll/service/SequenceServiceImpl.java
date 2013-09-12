@@ -1,29 +1,38 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+
+import static may.bestpoll.util.MongoUtil.get;
+import static may.bestpoll.util.MongoOperation.INC;
 
 public class SequenceServiceImpl implements SequenceService
 {
+	private static final String COLLECTION_NAME = "sequences";
+
+	private static final String FIELD_ID = "_id";
+	private static final String FIELD_COUNTER = "counter";
+
+	private final DBCollection sequences;
+
 	@Inject
-	public SequenceServiceImpl()
+	public SequenceServiceImpl(DB db)
 	{
-		// TODO
+		this.sequences = db.getCollection(COLLECTION_NAME);
 	}
 
 	@Override
 	public long getCounter(String name)
 	{
-/*
-		TODO
+		final BasicDBObject query = new BasicDBObject(FIELD_ID, name);
+		final BasicDBObject update = new BasicDBObject(INC.op, new BasicDBObject(FIELD_COUNTER, 1));
 
-		Query<Sequence> query = sequenceDAO.createQuery().field("_id").equal(name);
+		final DBObject counter = sequences.findAndModify(query, null, null, false, update, true, true);
 
-		UpdateOperations<Sequence> update = sequenceDAO.createUpdateOperations().inc("counter");
-		Sequence sequence = sequenceDAO.findAndModify(query, update, false, true);
-
-		return sequence.getCounter();
-*/
-		return 0;
+		return get(counter, FIELD_COUNTER);
 	}
 
 }

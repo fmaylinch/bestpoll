@@ -8,7 +8,7 @@ import com.mongodb.DBObject;
 import may.bestpoll.entities.User;
 import org.bson.types.ObjectId;
 
-import static may.bestpoll.util.MongoUtil.getString;
+import static may.bestpoll.util.MongoUtil.get;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class UserServiceImpl implements UserService
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService
 	/** Updates userObj if user has different values. It only updates name for now. */
 	private void updateUserObjIfNecessary(User user, DBObject userObj)
 	{
-		final String name = getString(userObj, FIELD_NAME);
+		final String name = get(userObj, FIELD_NAME);
 		if (isEmpty(name) || !name.equals(user.getName()))
 		{
 			userObj.put(FIELD_NAME, user.getName());

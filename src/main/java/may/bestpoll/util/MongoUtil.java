@@ -6,18 +6,12 @@ import java.util.List;
 
 public class MongoUtil
 {
-	/** Adds an element to an array */
-	public static final String OP_PUSH = "$push";
-
+	/**
+	 * Gets the value of a field and casts it, just to avoid the ugly casts.
+	 */
 	@SuppressWarnings("unchecked")
-	public static <E> List<E> getList(DBObject obj, String field)
+	public static <T> T get(DBObject obj, String field)
 	{
-		return (List<E>) obj.get(field);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static String getString(DBObject obj, String field)
-	{
-		return (String) obj.get(field);
+		return (T) obj.get(field);
 	}
 }
