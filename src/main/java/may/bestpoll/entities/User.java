@@ -14,6 +14,16 @@ public class User
 	private String name;
 
 
+	public User()
+	{
+	}
+
+	public User(ObjectId id)
+	{
+		this.id = id;
+	}
+
+
 	public ObjectId getId()
 	{
 		return id;

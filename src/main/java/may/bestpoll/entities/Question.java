@@ -1,16 +1,19 @@
 package may.bestpoll.entities;
 
+import java.util.Date;
 import java.util.List;
 
 // TODO: Check this pattern for votes: http://cookbook.mongodb.org/patterns/votes/
 
 public class Question
 {
-	private long id;
+	private int id;
 
 	private String message;
 
 	private String location; // TODO: improve: store real location like city, country or anywhere
+
+	private Date created;
 
 	private List<Answer> answers;
 
@@ -23,12 +26,12 @@ public class Question
 	}
 
 
-	public long getId()
+	public int getId()
 	{
 		return id;
 	}
 
-	public void setId(long id)
+	public void setId(int id)
 	{
 		this.id = id;
 	}
@@ -51,6 +54,16 @@ public class Question
 	public void setLocation(String location)
 	{
 		this.location = location;
+	}
+
+	public Date getCreated()
+	{
+		return created;
+	}
+
+	public void setCreated(Date created)
+	{
+		this.created = created;
 	}
 
 	public List<Answer> getAnswers()

@@ -8,7 +8,7 @@ import com.mongodb.DBObject;
 import may.bestpoll.entities.User;
 import org.bson.types.ObjectId;
 
-import static may.bestpoll.util.MongoUtil.get;
+import static may.bestpoll.util.mongo.MongoUtil.get;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class UserServiceImpl implements UserService

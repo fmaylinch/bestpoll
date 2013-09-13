@@ -1,7 +1,8 @@
-package may.bestpoll.util;
+package may.bestpoll.util.mongo;
 
 import com.mongodb.DBObject;
 
+import java.util.Date;
 import java.util.List;
 
 public class MongoUtil

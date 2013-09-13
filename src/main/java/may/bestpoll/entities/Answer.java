@@ -2,6 +2,8 @@ package may.bestpoll.entities;
 
 public class Answer
 {
+	private int id;
+
 	private String text;
 
 	private String url;
@@ -10,7 +12,7 @@ public class Answer
 
 	private Question question;
 
-	private int votes;
+	private int points;
 
 	private int yourVote;
 
@@ -19,6 +21,16 @@ public class Answer
 	{
 	}
 
+
+	public int getId()
+	{
+		return id;
+	}
+
+	public void setId(int id)
+	{
+		this.id = id;
+	}
 
 	public String getText()
 	{
@@ -60,14 +72,14 @@ public class Answer
 		this.question = question;
 	}
 
-	public int getVotes()
+	public int getPoints()
 	{
-		return votes;
+		return points;
 	}
 
-	public void setVotes(int votes)
+	public void setPoints(int points)
 	{
-		this.votes = votes;
+		this.points = points;
 	}
 
 	public int getYourVote()

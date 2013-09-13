@@ -110,6 +110,9 @@
             return successCallback(userCreated);
           });
         },
+        findLatestQuestions: function() {
+          return $http.get('api/question');
+        },
         createQuestion: function(question, successCallback) {
           return $http.post('api/question', question).success(function(questionCreated, status, headers, config) {
             $log.info("API: Question create OK");
@@ -127,89 +130,6 @@
     }
   ]).controller('FindTheBestController', [
     '$scope', '$log', 'FacebookService', 'FindTheBestApiService', function($scope, $log, FacebookService, ftbApi) {
-      $scope.questions = [
-        {
-          id: 0,
-          message: 'Street headphones (id=0)',
-          anwers: []
-        }, {
-          message: 'Shawarma',
-          location: 'Barcelona',
-          answers: [
-            {
-              text: 'Sannin',
-              points: 86,
-              yourVote: 1
-            }, {
-              text: 'Urgarit',
-              points: 56,
-              yourVote: 1,
-              url: 'http://www.ugarit.es'
-            }, {
-              text: 'Equinox',
-              points: 48,
-              yourVote: 1,
-              url: 'http://www.equinoxverdi.com/'
-            }, {
-              text: 'Sundown',
-              points: 13,
-              yourVote: 0
-            }, {
-              text: 'Petra',
-              points: 28,
-              yourVote: -1
-            }
-          ]
-        }, {
-          message: 'Brand of mountain bikes',
-          answers: [
-            {
-              text: 'Specialized',
-              points: 235,
-              yourVote: 0,
-              url: 'http://www.specialized.com'
-            }, {
-              text: 'Giant',
-              points: 186,
-              yourVote: 0,
-              url: 'http://www.giant-bicycles.com'
-            }, {
-              text: 'Cannondale',
-              points: 146,
-              yourVote: 0,
-              url: 'http://www.cannondale.com'
-            }, {
-              text: 'Mondraker',
-              points: 128,
-              yourVote: 0,
-              url: 'http://www.mondraker.com'
-            }, {
-              text: 'Lapierre',
-              points: 107,
-              yourVote: 0,
-              url: 'http://lapierrebikes.com/'
-            }
-          ]
-        }, {
-          message: 'Pizza restaurant',
-          location: 'Italy',
-          answers: [
-            {
-              text: 'Pizzalia 1',
-              points: 10,
-              yourVote: 0
-            }, {
-              text: 'Pizzalia 2',
-              points: 20,
-              yourVote: 0
-            }, {
-              text: 'Pizzalia 3',
-              points: 30,
-              yourVote: 0
-            }
-          ]
-        }
-      ];
       $scope.user = {
         logged: null
       };
@@ -233,11 +153,16 @@
           return $scope.user = userFromServer;
         });
       });
-      return $scope.$on('FacebookService:noUser', function() {
+      $scope.$on('FacebookService:noUser', function() {
         $log.info("Facebook user is gone");
         return $scope.user = {
           logged: false
         };
+      });
+      return ftbApi.findLatestQuestions().success(function(questions) {
+        $log.info("Questions found:");
+        $log.info(questions);
+        return $scope.questions = questions;
       });
     }
   ]).controller('NewQuestionController', [

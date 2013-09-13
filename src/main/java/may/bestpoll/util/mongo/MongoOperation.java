@@ -1,4 +1,4 @@
-package may.bestpoll.util;
+package may.bestpoll.util.mongo;
 
 /**
  * MongoDB operations.

@@ -17,9 +17,9 @@ public interface QuestionService
 	void create(Question question);
 
 	/**
-	 * Creates an answer.
+	 * Adds an answer.
 	 *
-	 * @param answer  must come with creator.id, question.id, text (must not already exist in question), [url].
+	 * @param answer  must come with question.id, creator.id, text (must not already exist), [url]
 	 */
 	void addAnswer(Answer answer);
 
@@ -30,4 +30,5 @@ public interface QuestionService
 	 * @param limit   maximum number of questions to retrieve (1 <= limit <= {@link #MAX_RESULT_SIZE})
 	 */
 	Collection<Question> findLatest(int offset, int limit);
+
 }

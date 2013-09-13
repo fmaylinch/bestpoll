@@ -18,9 +18,7 @@ public class ApplicationModule extends AbstractModule
     protected void configure()
     {
 		bind(SequenceService.class).to(SequenceServiceImpl.class);
-
 		bind(UserService.class).to(UserServiceImpl.class);
-
 		bind(QuestionService.class).to(QuestionServiceImpl.class);
     }
 

@@ -6,8 +6,8 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
-import static may.bestpoll.util.MongoUtil.get;
-import static may.bestpoll.util.MongoOperation.INC;
+import static may.bestpoll.util.mongo.MongoUtil.get;
+import static may.bestpoll.util.mongo.MongoOperation.INC;
 
 public class SequenceServiceImpl implements SequenceService
 {
@@ -25,7 +25,7 @@ public class SequenceServiceImpl implements SequenceService
 	}
 
 	@Override
-	public long getCounter(String name)
+	public int getCounter(String name)
 	{
 		final BasicDBObject query = new BasicDBObject(FIELD_ID, name);
 		final BasicDBObject update = new BasicDBObject(INC.op, new BasicDBObject(FIELD_COUNTER, 1));
