@@ -141,53 +141,41 @@ angular.module('findTheBestApp', ['Facebook'])
 
 
   # Service to access the FindTheBest API
+  # All methods return an $http promise with the result
   # ----------
   .factory('FindTheBestApiService', [
     '$http', '$log'
     ($http,   $log) ->
 
-      # TODO: always return the promise directly like in findLatestQuestions() ?
-
       service = {
 
-        # Registers a user
+        # Registers user
         # user: must contain 'facebookId' and 'name' properties.
-        # successCallback: called with the user as argument (it will also have the 'id' property)
+        # Returns the user from the server
         # ----------
-        registerUser: (user, successCallback) ->
+        registerUser: (user) ->
           $http.post('api/user', user)
-            .success((userCreated, status, headers, config) ->
-              $log.info("API: Register user OK")
-              successCallback(userCreated);
-            )
 
-        # Finds latest questions, returns a $http promise
+        # Finds latest questions
         # TODO: offset and limit params
+        # Returns the questions
         # ----------
         findLatestQuestions: ->
           $http.get('api/question')
 
         # Creates a question
         # question: must contain 'message' and 'creator.id'; 'location' is optional.
-        # successCallback: called with the created question as argument (it will have also the 'id' property)
+        # Returns the created question (it will have also the 'id' property)
         # ----------
-        createQuestion: (question, successCallback) ->
+        createQuestion: (question) ->
           $http.post('api/question', question)
-            .success((questionCreated, status, headers, config) ->
-              $log.info("API: Question create OK")
-              successCallback(questionCreated);
-            )
 
         # Adds an answer to a question
         # answer: must contain 'text', 'creator.id' and 'question.id'; 'url' is optional.
-        # successCallback: called with the created answer as argument (it will have also the 'id' property)
+        # Returns the created answer (it will have also the 'id' property)
         # ----------
-        createAnswer: (answer, successCallback) ->
+        createAnswer: (answer) ->
           $http.post('api/answer', answer)
-            .success((answerCreated, status, headers, config) ->
-              $log.info("API: Answer create OK")
-              successCallback(answerCreated);
-            )
       }
 
       service
@@ -208,10 +196,12 @@ angular.module('findTheBestApp', ['Facebook'])
       $scope.logout = ->
         FacebookService.logout()
 
+      # Listen to FacebookService events to know when a user logs in and out
+
       $scope.$on('FacebookService:user', (ev, fbUser) ->
         $log.info("Facebook user detected: " + fbUser.name)
         userToRegister = { facebookId: fbUser.id, name: fbUser.name } # Corresponds to User class
-        ftbApi.registerUser(userToRegister, (userFromServer) ->
+        ftbApi.registerUser(userToRegister).success((userFromServer) ->
           $log.info("User successfully logged on facebook and registered on our API")
           userFromServer.logged = true  # the user is logged
           $scope.user = userFromServer
@@ -224,6 +214,8 @@ angular.module('findTheBestApp', ['Facebook'])
         $scope.user = { logged: false }  # assign object when we know the user is not logged
         $log.info($scope.user)
       )
+
+      # Get latest questions TODO: get user votes
 
       ftbApi.findLatestQuestions().success((questions) ->
         $log.info("Questions found:")
@@ -244,7 +236,7 @@ angular.module('findTheBestApp', ['Facebook'])
       $scope.addQuestion = ->
         $scope.question.creator = {id:$scope.user.id}
         $log.info($scope.question)
-        ftbApi.createQuestion($scope.question, (questionCreated) ->
+        ftbApi.createQuestion($scope.question).success((questionCreated) ->
           $log.info("Question created!")
           $log.info(questionCreated)
           # TODO: Show message to user
@@ -262,7 +254,7 @@ angular.module('findTheBestApp', ['Facebook'])
       $scope.addNewAnswer = (question) ->
         answer = { text: question.newAnswer, creator: {id:$scope.user.id}, question: {id: question.id} }
         $log.info(answer)
-        ftbApi.createAnswer(answer, (answerCreated) ->
+        ftbApi.createAnswer(answer).success((answerCreated) ->
           $log.info("Answer created!")
           $log.info(answerCreated)
           # TODO: Show message to user

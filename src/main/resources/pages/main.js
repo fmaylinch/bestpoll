@@ -104,26 +104,17 @@
       var service;
 
       service = {
-        registerUser: function(user, successCallback) {
-          return $http.post('api/user', user).success(function(userCreated, status, headers, config) {
-            $log.info("API: Register user OK");
-            return successCallback(userCreated);
-          });
+        registerUser: function(user) {
+          return $http.post('api/user', user);
         },
         findLatestQuestions: function() {
           return $http.get('api/question');
         },
-        createQuestion: function(question, successCallback) {
-          return $http.post('api/question', question).success(function(questionCreated, status, headers, config) {
-            $log.info("API: Question create OK");
-            return successCallback(questionCreated);
-          });
+        createQuestion: function(question) {
+          return $http.post('api/question', question);
         },
-        createAnswer: function(answer, successCallback) {
-          return $http.post('api/answer', answer).success(function(answerCreated, status, headers, config) {
-            $log.info("API: Answer create OK");
-            return successCallback(answerCreated);
-          });
+        createAnswer: function(answer) {
+          return $http.post('api/answer', answer);
         }
       };
       return service;
@@ -147,7 +138,7 @@
           facebookId: fbUser.id,
           name: fbUser.name
         };
-        return ftbApi.registerUser(userToRegister, function(userFromServer) {
+        return ftbApi.registerUser(userToRegister).success(function(userFromServer) {
           $log.info("User successfully logged on facebook and registered on our API");
           userFromServer.logged = true;
           $scope.user = userFromServer;
@@ -175,7 +166,7 @@
           id: $scope.user.id
         };
         $log.info($scope.question);
-        return ftbApi.createQuestion($scope.question, function(questionCreated) {
+        return ftbApi.createQuestion($scope.question).success(function(questionCreated) {
           $log.info("Question created!");
           $log.info(questionCreated);
           return $scope.question = {};
@@ -197,7 +188,7 @@
           }
         };
         $log.info(answer);
-        return ftbApi.createAnswer(answer, function(answerCreated) {
+        return ftbApi.createAnswer(answer).success(function(answerCreated) {
           $log.info("Answer created!");
           $log.info(answerCreated);
           return question.newAnswer = "";
