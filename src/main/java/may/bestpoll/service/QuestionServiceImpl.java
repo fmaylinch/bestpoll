@@ -57,13 +57,14 @@ public class QuestionServiceImpl implements QuestionService
 	public void create(Question question)
 	{
 		question.setId(sequenceService.getCounter(QUESTIONS_COLLECTION_NAME));
+		question.setCreated(new Date());
 
 		final DBObject questionObj = new BasicDBObject()
 				.append(FIELD_ID, question.getId())
 				.append(FIELD_CREATOR, question.getCreator().getId())
 				.append(FIELD_LOCATION, question.getLocation())
 				.append(FIELD_MESSAGE, question.getMessage())
-				.append(FIELD_CREATED, new Date());
+				.append(FIELD_CREATED, question.getCreated());
 
 		questionsCol.insert(questionObj);
 	}

@@ -150,14 +150,16 @@
         return ftbApi.registerUser(userToRegister, function(userFromServer) {
           $log.info("User successfully logged on facebook and registered on our API");
           userFromServer.logged = true;
-          return $scope.user = userFromServer;
+          $scope.user = userFromServer;
+          return $log.info($scope.user);
         });
       });
       $scope.$on('FacebookService:noUser', function() {
         $log.info("Facebook user is gone");
-        return $scope.user = {
+        $scope.user = {
           logged: false
         };
+        return $log.info($scope.user);
       });
       return ftbApi.findLatestQuestions().success(function(questions) {
         $log.info("Questions found:");

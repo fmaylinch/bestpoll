@@ -146,7 +146,7 @@ angular.module('findTheBestApp', ['Facebook'])
     '$http', '$log'
     ($http,   $log) ->
 
-#      TODO: return the promise directly and call success from the other services?
+      # TODO: always return the promise directly like in findLatestQuestions() ?
 
       service = {
 
@@ -215,12 +215,14 @@ angular.module('findTheBestApp', ['Facebook'])
           $log.info("User successfully logged on facebook and registered on our API")
           userFromServer.logged = true  # the user is logged
           $scope.user = userFromServer
+          $log.info($scope.user)
         )
       )
 
       $scope.$on('FacebookService:noUser', ->
         $log.info("Facebook user is gone")
         $scope.user = { logged: false }  # assign object when we know the user is not logged
+        $log.info($scope.user)
       )
 
       ftbApi.findLatestQuestions().success((questions) ->
