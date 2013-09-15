@@ -22,7 +22,11 @@ public class Question
 
 	public Question()
 	{
+	}
 
+	public Question(int id)
+	{
+		this.id = id;
 	}
 
 

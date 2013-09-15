@@ -169,7 +169,11 @@
         return ftbApi.createQuestion($scope.question).success(function(questionCreated) {
           $log.info("Question created!");
           $log.info(questionCreated);
-          return $scope.question = {};
+          $scope.question = {};
+          if (!questionCreated.answers) {
+            questionCreated.answers = [];
+          }
+          return $scope.questions.unshift(questionCreated);
         });
       };
     }
@@ -191,7 +195,8 @@
         return ftbApi.createAnswer(answer).success(function(answerCreated) {
           $log.info("Answer created!");
           $log.info(answerCreated);
-          return question.newAnswer = "";
+          question.newAnswer = "";
+          return question.answers.push(answerCreated);
         });
       };
     }

@@ -239,9 +239,14 @@ angular.module('findTheBestApp', ['Facebook'])
         ftbApi.createQuestion($scope.question).success((questionCreated) ->
           $log.info("Question created!")
           $log.info(questionCreated)
+
           # TODO: Show message to user
-          # TODO: Add question to results? Depending on filter (although now there is no filter)
+
+          # Reset inputs for question and add new question to the questions in the view
           $scope.question = {}
+          if !questionCreated.answers
+            questionCreated.answers = [] # Init answer array in case it doesn't exist (usually not since the question is new)
+          $scope.questions.unshift(questionCreated) # TODO: Add question depending on current search (when there is search!)
         )
   ])
 
@@ -257,8 +262,11 @@ angular.module('findTheBestApp', ['Facebook'])
         ftbApi.createAnswer(answer).success((answerCreated) ->
           $log.info("Answer created!")
           $log.info(answerCreated)
+
           # TODO: Show message to user
-          # TODO: Add answer to question in the view
+
+          # Reset input and add new answer to the question in the view
           question.newAnswer = ""
+          question.answers.push(answerCreated)
         )
   ])

@@ -1,10 +1,7 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import may.bestpoll.entities.Answer;
 import may.bestpoll.entities.Question;
 import may.bestpoll.entities.User;
@@ -36,7 +33,7 @@ public class QuestionServiceImpl implements QuestionService
 	private static final String FIELD_QUESTION_ID = "q_id";
 	private static final String FIELD_TEXT = "text";
 	private static final String FIELD_URL = "url";
-	private static final String FIELD_VOTES = "votes";
+	private static final String FIELD_POINTS = "pnt";
 	private static final String FIELD_UP_VOTES = "up";
 	private static final String FIELD_DOWN_VOTES = "down";
 
@@ -87,7 +84,7 @@ public class QuestionServiceImpl implements QuestionService
 				.append(FIELD_QUESTION_ID, answer.getQuestion().getId())
 				.append(FIELD_TEXT, answer.getText())
 				.append(FIELD_CREATOR, answer.getCreator().getId())
-				.append(FIELD_VOTES, 0);
+				.append(FIELD_POINTS, 0);
 		if (isNotEmpty(answer.getUrl()))
 			newAnswerObj.put(FIELD_URL, answer.getUrl());
 
@@ -99,71 +96,39 @@ public class QuestionServiceImpl implements QuestionService
 	{
 		DBObject orderByCreatedDesc = new BasicDBObject(FIELD_CREATED, -1);
 
-		List<DBObject> questionObjs = questionsCol.find().sort(orderByCreatedDesc).skip(offset).limit(limit).toArray();
-
-		List<Question> questions = FunctionalUtils.map(questionObjs, questionMongo2Java);
-
+		final List<DBObject> questionObjs = questionsCol.find().sort(orderByCreatedDesc).skip(offset).limit(limit).toArray();
+		final List<Question> questions = FunctionalUtils.map(questionObjs, questionMongo2Java);
 		fillAnswers(questions);
 
 		return questions;
-
-		// Use a date instead of an offset? It's faster. But I can only do that if sorted by date.
-		// Not, for example, if sorted by total votes, etc.
-
-		// I think it will be better to separate the questions and answers collections
-		// When querying questions a get a bunch (say 10 or 20) and then do an $in to get their answers.
-		// Using the 3-query solution I'd have to query the answers 3 times.
-
-		// To add up-votes ('up' field) to an answer (answers are in the 'ans' field):
-		//   If we don't know the answer (although better find it by id, not name)
-		//     db.questions.update({_id:QUESTION_ID, "ans.id":ANSWER_ID}, {"$push":{"ans.$.up":USER_ID}})
-		//   If we know the position of the answer (can we retrieve it when querying?):
-		//     db.questions.update({_id:QUESTION_ID}, {"$push":{"ans.ANSWER_POSITION.up":id1}})
-		//
-		// User $pull instead of $push to remove vote
-
-		// Get answers I voted up:
-		//   db.questions.aggregate([ {$unwind:"$ans"}, {$match: {"ans.up":id1}} ])
-		// Get answers I voted down:
-		//   db.questions.aggregate([ {$unwind:"$ans"}, {$match: {"ans.down":id1}} ])
-		// Get answers I didn't vote:
-		//   db.questions.aggregate([ {$unwind:"$ans"}, {$match: {"ans.up":{$ne:id1}, "ans.down":{$ne:id1}}} ])
 	}
 
+	/** Fills question with its answers */
 	private void fillAnswers(List<Question> questions)
 	{
 		for (Question question : questions)
 		{
-			List<Answer> answers = new ArrayList<Answer>();
-
-			// TODO: query answers collection
-			Random random = new Random();
-			for (int i = 1; i <= 5; i++)
-			{
-				Answer dummyAnswer = new Answer();
-				dummyAnswer.setPoints(random.nextInt(100));
-				dummyAnswer.setText("Dummy answer " + i);
-				if (random.nextBoolean())
-					dummyAnswer.setUrl("http://javadeveloping.wordpress.com");
-				answers.add(dummyAnswer);
-			}
-
+			final List<DBObject> answerObjs = findAnswerObjs(question.getId()).toArray();
+			final List<Answer> answers = FunctionalUtils.map(answerObjs, answerMongo2Java);
 			question.setAnswers(answers);
 		}
 	}
 
-	private Object findQuestionObj(long questionId)
+	private DBCursor findAnswerObjs(int questionId)
 	{
-		final BasicDBObject query = new BasicDBObject(FIELD_ID, questionId);
-		return questionsCol.findOne(query);
+		return answersCol.find(new BasicDBObject(FIELD_QUESTION_ID, questionId));
+	}
+
+	private Object findQuestionObj(int questionId)
+	{
+		return questionsCol.findOne(new BasicDBObject(FIELD_ID, questionId));
 	}
 
 	private Object findAnswerObj(long questionId, String answerText)
 	{
-		final BasicDBObject query = new BasicDBObject()
+		return answersCol.findOne(new BasicDBObject()
 				.append(FIELD_QUESTION_ID, questionId)
-				.append(FIELD_TEXT, answerText);
-		return answersCol.findOne(query);
+				.append(FIELD_TEXT, answerText));
 	}
 
 
@@ -178,6 +143,23 @@ public class QuestionServiceImpl implements QuestionService
 			result.setCreator(new User((ObjectId) obj.get(FIELD_CREATOR))); // TODO: Store user name also in questions collection?
 			result.setMessage((String) obj.get(FIELD_MESSAGE));
 			result.setLocation((String) obj.get(FIELD_LOCATION));
+			return result;
+		}
+	};
+
+	private static final F<DBObject,Answer> answerMongo2Java = new F<DBObject, Answer>()
+	{
+		@Override
+		public Answer f(DBObject obj)
+		{
+			Answer result = new Answer();
+			result.setId((Integer) obj.get(FIELD_ID));
+			result.setQuestion(new Question((Integer) obj.get(FIELD_QUESTION_ID)));
+			result.setCreator(new User((ObjectId) obj.get(FIELD_CREATOR))); // TODO: Store user name also in answers collection?
+			result.setText((String) obj.get(FIELD_TEXT));
+			result.setUrl((String) obj.get(FIELD_URL));
+			result.setPoints((Integer) obj.get(FIELD_POINTS));
+			result.setYourVote(0); // TODO: We need the user to calculate this value
 			return result;
 		}
 	};
