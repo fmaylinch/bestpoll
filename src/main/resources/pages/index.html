@@ -30,17 +30,16 @@
 			<ul class="nav navbar-nav navbar-right ng-cloak">
 
 				<!-- Login button. Showed when (we know that) the user is not logged. -->
-				<li ng-show="user.logged != null && !user.logged">
+				<li ng-if="userIsNotLogged()">
 					<button class="btn btn-primary" ng-click="login()">
 						<b>Login with facebook</b>
 					</button>
 				</li>
 
 				<!-- User picture and name. Showed when we the user is logged. -->
-				<li ng-show="user.logged" class="dropdown">
+				<li ng-if="userIsLogged()" class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<!-- ng-if to avoid bad request to image when there is no user.facebookId -->
-						<img ng-if="user.logged" ng-src="http://graph.facebook.com/{{user.facebookId}}/picture">
+						<img ng-src="http://graph.facebook.com/{{user.facebookId}}/picture">
 						{{ user.name }} <b class="caret"></b>
 					</a>
 					<ul class="dropdown-menu">
@@ -64,7 +63,7 @@
 					<span class="best-in">in</span>
 					<input type="text" placeholder="where?" class="best-place"
 						   ng-model="question.location">
-					<button ng-disabled="!user.logged || !question.message" ng-click="addQuestion()" class="btn btn-primary btn-xs">Add question</button>
+					<button ng-disabled="disableAddQuestion()" ng-click="addQuestion()" class="btn btn-primary btn-xs">Add question</button>
 				</h3>
 			</div>
 		</div>
@@ -95,7 +94,7 @@
 						</li>
 						<li>
 							<input ng-model="question.newAnswer" type="text">
-							<button ng-click="addNewAnswer(question)" ng-disabled="!user.logged || !question.newAnswer" class="btn btn-primary btn-xs">Add answer</button>
+							<button ng-click="addNewAnswer(question)" ng-disabled="disableAddAnswer(question)" class="btn btn-primary btn-xs">Add answer</button>
 						</li>
 					</ul>
 				</div>

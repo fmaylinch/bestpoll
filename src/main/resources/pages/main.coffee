@@ -196,22 +196,29 @@ angular.module('findTheBestApp', ['Facebook'])
       $scope.logout = ->
         FacebookService.logout()
 
+      $scope.userIsLogged = ->
+        $scope.user.logged
+
+      # We also need this method because at first we don't know if the user is logged or not ( logged == null )
+      $scope.userIsNotLogged = ->
+        $scope.user.logged != null && !$scope.user.logged
+
       # Listen to FacebookService events to know when a user logs in and out
 
       $scope.$on('FacebookService:user', (ev, fbUser) ->
-        $log.info("Facebook user detected: " + fbUser.name)
+        $log.info("Facebook logged on Facebook: " + fbUser.name)
         userToRegister = { facebookId: fbUser.id, name: fbUser.name } # Corresponds to User class
         ftbApi.registerUser(userToRegister).success((userFromServer) ->
-          $log.info("User successfully logged on facebook and registered on our API")
-          userFromServer.logged = true  # the user is logged
+          $log.info("User registered on FindTheBest API")
           $scope.user = userFromServer
+          $scope.user.logged = true
           $log.info($scope.user)
         )
       )
 
       $scope.$on('FacebookService:noUser', ->
         $log.info("Facebook user is gone")
-        $scope.user = { logged: false }  # assign object when we know the user is not logged
+        $scope.user = { logged: false }
         $log.info($scope.user)
       )
 
@@ -232,6 +239,9 @@ angular.module('findTheBestApp', ['Facebook'])
     ($scope,   $log,   ftbApi) ->
 
       $scope.question = {}
+
+      $scope.disableAddQuestion = ->
+        !$scope.userIsLogged() || !$scope.question.message
 
       $scope.addQuestion = ->
         $scope.question.creator = {id:$scope.user.id}
@@ -255,6 +265,9 @@ angular.module('findTheBestApp', ['Facebook'])
   .controller('QuestionsController', [
     '$scope', '$log', 'FindTheBestApiService',
     ($scope,   $log,   ftbApi) ->
+
+      $scope.disableAddAnswer = (question) ->
+        !$scope.userIsLogged() || !question.newAnswer
 
       $scope.addNewAnswer = (question) ->
         answer = { text: question.newAnswer, creator: {id:$scope.user.id}, question: {id: question.id} }

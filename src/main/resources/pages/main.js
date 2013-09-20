@@ -130,18 +130,24 @@
       $scope.logout = function() {
         return FacebookService.logout();
       };
+      $scope.userIsLogged = function() {
+        return $scope.user.logged;
+      };
+      $scope.userIsNotLogged = function() {
+        return $scope.user.logged !== null && !$scope.user.logged;
+      };
       $scope.$on('FacebookService:user', function(ev, fbUser) {
         var userToRegister;
 
-        $log.info("Facebook user detected: " + fbUser.name);
+        $log.info("Facebook logged on Facebook: " + fbUser.name);
         userToRegister = {
           facebookId: fbUser.id,
           name: fbUser.name
         };
         return ftbApi.registerUser(userToRegister).success(function(userFromServer) {
-          $log.info("User successfully logged on facebook and registered on our API");
-          userFromServer.logged = true;
+          $log.info("User registered on FindTheBest API");
           $scope.user = userFromServer;
+          $scope.user.logged = true;
           return $log.info($scope.user);
         });
       });
@@ -161,6 +167,9 @@
   ]).controller('NewQuestionController', [
     '$scope', '$log', 'FindTheBestApiService', function($scope, $log, ftbApi) {
       $scope.question = {};
+      $scope.disableAddQuestion = function() {
+        return !$scope.userIsLogged() || !$scope.question.message;
+      };
       return $scope.addQuestion = function() {
         $scope.question.creator = {
           id: $scope.user.id
@@ -179,6 +188,9 @@
     }
   ]).controller('QuestionsController', [
     '$scope', '$log', 'FindTheBestApiService', function($scope, $log, ftbApi) {
+      $scope.disableAddAnswer = function(question) {
+        return !$scope.userIsLogged() || !question.newAnswer;
+      };
       return $scope.addNewAnswer = function(question) {
         var answer;
 
