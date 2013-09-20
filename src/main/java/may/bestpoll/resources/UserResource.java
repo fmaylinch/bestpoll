@@ -1,6 +1,7 @@
 package may.bestpoll.resources;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import may.bestpoll.entities.User;
 import may.bestpoll.service.UserService;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON)
+@Singleton
 public class UserResource
 {
 	private static final Logger logger = LoggerFactory.getLogger(UserResource.class);

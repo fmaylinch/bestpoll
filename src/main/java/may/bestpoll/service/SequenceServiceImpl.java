@@ -1,6 +1,7 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -9,6 +10,7 @@ import com.mongodb.DBObject;
 import static may.bestpoll.util.mongo.MongoUtil.get;
 import static may.bestpoll.util.mongo.MongoOperation.INC;
 
+@Singleton
 public class SequenceServiceImpl implements SequenceService
 {
 	private static final String COLLECTION_NAME = "sequences";

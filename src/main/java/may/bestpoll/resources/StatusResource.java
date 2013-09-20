@@ -1,5 +1,6 @@
 package may.bestpoll.resources;
 
+import com.google.inject.Singleton;
 import may.bestpoll.entities.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/status")
 @Produces(MediaType.APPLICATION_JSON)
+@Singleton
 public class StatusResource
 {
 	private static final Logger logger = LoggerFactory.getLogger(StatusResource.class);

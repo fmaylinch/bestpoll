@@ -1,6 +1,7 @@
 package may.bestpoll.resources;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import may.bestpoll.entities.Answer;
 import may.bestpoll.entities.Question;
 import may.bestpoll.service.QuestionService;
@@ -14,6 +15,7 @@ import java.util.Collection;
 
 @Path("/answer")
 @Produces(MediaType.APPLICATION_JSON)
+@Singleton
 public class AnswerResource
 {
 	private static final Logger logger = LoggerFactory.getLogger(AnswerResource.class);

@@ -3,6 +3,7 @@ package may.bestpoll;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
@@ -43,6 +44,7 @@ public class ApplicationModule extends AbstractModule
     }
 
 	@Provides
+	@Singleton
 	@Inject
 	public DB provideDB(ApplicationConfiguration configuration) throws UnknownHostException
 	{
@@ -56,6 +58,7 @@ public class ApplicationModule extends AbstractModule
 	}
 
 	@Provides
+	@Singleton
 	@Inject
     public Mongo provideMongo(DB db)
     {

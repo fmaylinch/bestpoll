@@ -1,6 +1,7 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.mongodb.*;
 import may.bestpoll.entities.Answer;
 import may.bestpoll.entities.Question;
@@ -16,6 +17,7 @@ import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
+@Singleton
 public class QuestionServiceImpl implements QuestionService
 {
 	private static final Logger logger = LoggerFactory.getLogger(QuestionServiceImpl.class);

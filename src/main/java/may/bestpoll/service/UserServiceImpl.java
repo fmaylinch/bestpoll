@@ -1,6 +1,7 @@
 package may.bestpoll.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -11,6 +12,7 @@ import org.bson.types.ObjectId;
 import static may.bestpoll.util.mongo.MongoUtil.get;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+@Singleton
 public class UserServiceImpl implements UserService
 {
 	private static final String COLLECTION_NAME = "users";
