@@ -36,7 +36,7 @@
 					</button>
 				</li>
 
-				<!-- User picture and name. Showed when we the user is logged. -->
+				<!-- User picture and name. Showed when (we know that) the user is logged. -->
 				<li ng-if="userIsLogged()" class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 						<img ng-src="http://graph.facebook.com/{{user.facebookId}}/picture">
@@ -117,7 +117,8 @@
 	<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>-->
 
 	<!-- Facebook helper for AngularJS (also downloaded to angular/facebook) -->
-	<script src="http://rawgithub.com/Ciul/Angularjs-Facebook/master/src/facebook.js"></script>
+	<!----><script src="https://github.com/Ciul/angularjs-facebook/blob/master/lib/angular-facebook.js"></script>
+	<script src="facebook.js"></script>
 
 	<!-- FindTheBest angular module -->
 	<script src="main.js"></script>
