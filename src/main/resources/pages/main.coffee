@@ -4,7 +4,7 @@
 
 # Module for FindTheBest
 # ----------
-angular.module('findTheBestApp', ['Facebook'])
+angular.module('findTheBestApp', ['facebook'])
 
   .config([
     'FacebookProvider', '$httpProvider'
