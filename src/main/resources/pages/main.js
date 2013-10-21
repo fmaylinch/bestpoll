@@ -17,33 +17,6 @@
         });
       };
     }
-  ]).factory('FakeFacebookService', [
-    '$rootScope', function($rootScope) {
-      var service;
-
-      service = {
-        loginIfNecessary: function() {
-          return service.login();
-        },
-        login: function() {
-          return service.applyBroadcastUser();
-        },
-        logout: function() {
-          return $rootScope.$broadcast('FacebookService:noUser');
-        },
-        applyBroadcastUser: function() {
-          var user;
-
-          user = {
-            id: '1359270259',
-            name: 'Ferran May'
-          };
-          return $rootScope.$broadcast('FacebookService:user', user);
-        }
-      };
-      service.applyBroadcastUser();
-      return service;
-    }
   ]).factory('FacebookService', [
     '$rootScope', '$log', 'Facebook', function($rootScope, $log, Facebook) {
       var service;
@@ -69,8 +42,8 @@
             });
           });
         },
-        applyBroadcastLogout: function() {
-          $log.info("Broadcasting logout");
+        applyBroadcastNoUser: function() {
+          $log.info("Broadcasting no-user");
           return $rootScope.$apply(function() {
             return $rootScope.$broadcast('FacebookService:noUser');
           });
@@ -84,7 +57,7 @@
             return service.applyBroadcastUser();
           } else {
             $log.info("User not logged");
-            return service.applyBroadcastLogout();
+            return service.applyBroadcastNoUser();
           }
         });
       });
@@ -95,7 +68,7 @@
         }
       });
       $rootScope.$on('Facebook:logout', function() {
-        return service.applyBroadcastLogout();
+        return service.applyBroadcastNoUser();
       });
       return service;
     }
@@ -186,7 +159,7 @@
         });
       };
     }
-  ]).controller('QuestionsController', [
+  ]).controller('QuestionListController', [
     '$scope', '$log', 'FindTheBestApiService', function($scope, $log, ftbApi) {
       $scope.disableAddAnswer = function(question) {
         return !$scope.userIsLogged() || !question.newAnswer;

@@ -32,39 +32,6 @@ angular.module('findTheBestApp', ['facebook'])
         )
   ])
 
-  # To use this fake service you must remove the FacebookProvider in config()
-  # ----------
-  .factory('FakeFacebookService', [
-    '$rootScope'
-    ($rootScope) ->
-
-      service = {
-
-        # Login if not already logged and broadcasts 'FacebookService:user' with user
-        loginIfNecessary: ->
-          service.login()
-
-        # Login and broadcasts 'FacebookService:user' with user
-        login: ->
-          service.applyBroadcastUser()
-
-        # Logout and broadcasts 'FacebookService.noUser'
-        logout: ->
-          $rootScope.$broadcast('FacebookService:noUser')
-
-        # Broadcasts 'FacebookService:user' with user
-        applyBroadcastUser: ->
-          user = { id:'1359270259', name:'Ferran May' }
-          $rootScope.$broadcast('FacebookService:user', user)
-      }
-
-      # Pretend the user is already logged in
-      service.applyBroadcastUser()
-
-      service
-  ])
-
-
   # FacebookService will:
   #   $broadcast('FacebookService:user', user)
   #     when it is aware of a new user. At the beginning and each time a user logs in.
@@ -101,8 +68,8 @@ angular.module('findTheBestApp', ['facebook'])
           )
 
         # $broadcast('FacebookService:noUser') (inside angular with $apply)
-        applyBroadcastLogout: ->
-          $log.info("Broadcasting logout")
+        applyBroadcastNoUser: ->
+          $log.info("Broadcasting no-user")
           $rootScope.$apply( ->
             $rootScope.$broadcast('FacebookService:noUser')
           )
@@ -120,7 +87,7 @@ angular.module('findTheBestApp', ['facebook'])
               service.applyBroadcastUser()
             else
               $log.info("User not logged")
-              service.applyBroadcastLogout()
+              service.applyBroadcastNoUser()
         )
       )
 
@@ -133,7 +100,7 @@ angular.module('findTheBestApp', ['facebook'])
 
       # For convenience, when a user is logged out, an event will be broadcasted (with $apply)
       $rootScope.$on('Facebook:logout', ->
-        service.applyBroadcastLogout()
+        service.applyBroadcastNoUser()
       )
 
       service
@@ -262,7 +229,7 @@ angular.module('findTheBestApp', ['facebook'])
 
   # Controller for the question list, where answers can be added and voted
   # ----------
-  .controller('QuestionsController', [
+  .controller('QuestionListController', [
     '$scope', '$log', 'FindTheBestApiService',
     ($scope,   $log,   ftbApi) ->
 
